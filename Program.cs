@@ -20,11 +20,14 @@ namespace ovh_transfer
             {
                 CopyToOvh();
                 Console.WriteLine("OK," + DateTime.UtcNow);
+                var containerName = GetSetting("containername");
+                SendEamil(true, "OK," + DateTime.UtcNow, containerName);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                SendEamil(false, ex.ToString());
+                var containerName = GetSetting("containername");
+                SendEamil(false, ex.ToString(), containerName);
             }
 
         }
@@ -95,7 +98,7 @@ namespace ovh_transfer
             }
         }
 
-        private static void SendEamil(bool isOK, string emailMsg)
+        private static void SendEamil(bool isOK, string emailMsg,string containername)
         {
             var smtp = GetSetting("smtp");
             var smtpuser = GetSetting("smtpuser");
@@ -112,9 +115,9 @@ namespace ovh_transfer
                 mail.From = new MailAddress(email);
                 mail.To.Add(email);
                 if (isOK)
-                    mail.Subject = "WebServerBackup: OK";
+                    mail.Subject = "OVH Transfer: " + containername + " OK";
                 else
-                    mail.Subject = "WebServerBackup: FAILED";
+                    mail.Subject = "OVH Transfer: " + containername + " FAILED";
                 mail.Body = emailMsg;
 
                 SmtpServer.Port = 25;
